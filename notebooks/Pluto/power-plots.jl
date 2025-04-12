@@ -16,551 +16,161 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ e380e9a2-483a-11ef-1f5e-f99f5fa44310
+# ╔═╡ ca0868a6-8fc5-43f9-a16b-2b0617330f5d
 begin
-	using PlutoUI
 	using Plots
 	using LinearAlgebra
+	using Statistics
+	using PlutoUI
 end
 
-# ╔═╡ bde81487-d697-414a-95a7-bb345482eb36
-PlutoUI.TableOfContents(include_definitions=false)
+# ╔═╡ a52c3eb1-132d-4977-9def-a0f3b152834f
+TableOfContents()
 
-# ╔═╡ 8fd1489d-f07a-4a0a-836d-973246d67120
-md"## Modelagem matemática da resposta do circuito RL"
+# ╔═╡ 6c2c3b16-0d98-476f-8ff2-823f8a8f4841
+t = 0:1e-4:0.05
 
-# ╔═╡ afaab200-659f-4a79-81a9-13fe162a0083
-md"### Equações para trasitório em circuito RL"
-
-# ╔═╡ f7efdf71-c070-4bd2-9db4-edbcd11c3b2e
-md"""
-Expressão completa (componente ac + componente dc) da corente circulante em um circuito RL:
-"""
-
-# ╔═╡ b25bb256-6ee0-442c-93b5-cad363890c4e
-md"$\begin{aligned}
-i(t) & =i_{\mathrm{ac}}(t)+i_{\mathrm{dc}}(t) \\
-& =\frac{\sqrt{2} \mathrm{~V}}{\mathrm{Z}}\left[\sin (\omega t+\alpha-\theta)-\sin (\alpha-\theta) e^{-t / \mathrm{T}}\right] \quad \mathrm{A}
-\end{aligned}$"
-
-# ╔═╡ c6dea615-231f-4663-b140-e1112bdfbc8b
-md"""
-Exmpressões em separado para as componentes de corrente ac e dc:
-"""
-
-# ╔═╡ e8287e62-a2ec-4601-9822-4ec43948194c
-md"$\begin{aligned}
-& i_{\mathrm{ac}}(t)=\frac{\sqrt{2} \mathrm{~V}}{\mathrm{Z}} \sin (\omega t+\alpha-\theta) \quad \mathrm{A} \\
-& i_{\mathrm{dc}}(t)=-\frac{\sqrt{2} \mathrm{~V}}{\mathrm{Z}} \sin (\alpha-\theta) e^{-t / T}
-\end{aligned}$"
-
-# ╔═╡ 79c048fc-2b89-41eb-9355-cd0ed796a004
-md"""
-Definições das constantes utilizadas nas equações de corrente:
-"""
-
-# ╔═╡ 3cfe3dd5-b206-4404-8148-13513ecb8760
-md"$\begin{aligned}
-& Z=\sqrt{\mathrm{R}^2+(\omega \mathrm{L})^2}=\sqrt{\mathrm{R}^2+\mathrm{X}^2} \Omega \\
-& \theta=\tan ^{-1} \frac{\omega \mathrm{L}}{\mathrm{R}}=\tan ^{-1} \frac{\mathrm{X}}{\mathrm{R}} \\
-& \mathrm{T}=\frac{\mathrm{L}}{\mathrm{R}}=\frac{\mathrm{X}}{\omega \mathrm{R}}=\frac{\mathrm{X}}{2 \pi f \mathrm{R}} \quad s
-\end{aligned}$"
-
-# ╔═╡ 2ad11673-2a00-4dad-ab55-91b9d193bdf7
-R = 0.8
-
-# ╔═╡ bdfdbdd3-cfb9-4190-a565-410d97603a99
-X = 8.0
-
-# ╔═╡ 8eba05b8-5aac-4d63-8869-c58e17ab69ab
-V = 20e3
-
-# ╔═╡ 57ce96cf-a051-409a-b899-7a10e70c1b19
-Z = √(R^2 + X^2)
-
-# ╔═╡ 45679f09-bf7a-4b32-8d47-bf79a3c41f37
-θ = atan(X/R)
-
-# ╔═╡ c7e79b2a-ab09-44bf-a31e-b052a8dbeed9
+# ╔═╡ 2430af34-3bbe-4a80-bebe-1363843f3063
 f = 60.0
 
-# ╔═╡ dc827722-d075-4ea2-a729-576c98c48649
-ω = 2π*f
+# ╔═╡ 13dad844-080b-4b4c-82fa-85c98e547501
+w = 2.0 * π * f
 
-# ╔═╡ 10888544-51c7-463c-87b6-0bbde861cda6
-T = X/(ω*R)
+# ╔═╡ a126a83b-1047-48c0-9a98-d9efb8e392e4
+V = 100.0 # valor eficaz da senoide
 
-# ╔═╡ 87aa731a-35be-4800-a6d0-de7b84625503
-md"Resolvendo a equação diferencial de primeira ordem"
+# ╔═╡ bfe58c09-4d88-40ab-b952-a2a9308b51ee
+√2 * V # valor de pico da senoide
 
-# ╔═╡ 2cb7d768-4a1f-42e3-8bde-95a0b61d82da
-t = 0:0.0001:0.1
+# ╔═╡ cc447562-3008-49d6-b1a8-abadbf13859b
+v(t) = √2 * V * cos.(w * t)
 
-# ╔═╡ 053b9c29-a630-4f4b-a8d6-444980049cf6
-@bind α Slider(θ-π/2:0.1:θ+π/2, default=θ)
+# ╔═╡ 3bfe76b0-7215-44ba-b0b4-46fbf7906a41
+plot(t, v(t), lw=2.0, gridalpha=0.8)
 
-# ╔═╡ 5928d337-ded3-4490-9edc-61e015d7f9e7
-α
+# ╔═╡ 3e3af0ef-6d9d-48d5-ac73-9475f9abeb63
+md"""
+## Carga Resistiva
+"""
 
-# ╔═╡ 78f2aed3-64ba-42e0-97fb-f9bb53c2b599
-iac(t) = √2 * V / Z * sin(ω*t + α - θ)
+# ╔═╡ 11f54bea-ab9b-4a8c-8b9b-2d558863f8fd
+R = 10.0
 
-# ╔═╡ 754dcf16-e2fb-447a-a203-708c4e9e5e71
-idc(t) = - √2 * V / Z * sin(α - θ) * exp(-t / T)
+# ╔═╡ 89dce491-0281-446a-a2cb-847b63ef7ab4
+Ir = V / R # valor eficaz de corrente
 
-# ╔═╡ e8adbb2d-ff98-4a1e-a4cb-a305c4ec0f53
-Plots.plot(t, idc.(t), lw=2.0, gridalpha=0.7)
+# ╔═╡ 6f1945f1-8c00-4afc-b99e-111a4088ec46
+ir(t) = v(t) / R
 
-# ╔═╡ d54fb2ec-15e1-4e50-9172-b6cbbc204be0
-md"## Valor RMS e Fator de Assimetria"
-
-# ╔═╡ 27ee4ed2-eda9-42d2-b5b2-05b70019dce1
-irms(t) = V/Z * √(1 + 2 * exp(-2t/T))
-
-# ╔═╡ 10c8d80a-5b65-457d-8358-c5e4d1780c4b
-Plots.plot(t, irms.(t), lw=2.0, gridalpha=0.7)
-
-# ╔═╡ aee6f559-9190-42b5-aa0e-abe72afbf440
-md"##  Three-Phase Short Circuit—Unloaded Synchronous Machine"
-
-# ╔═╡ 9b790bb9-bffb-41b1-90e8-c3340f41b656
-md"$\begin{aligned}
-i_{\mathrm{ac}}(t)= & \sqrt{2} \mathrm{E}_g\left[\left(\frac{\mathrm{I}}{\mathrm{X}_d^{\prime \prime}}-\frac{\mathrm{I}}{\mathrm{X}_d^{\prime}}\right) e^{-t / \mathrm{T}_d^{\prime \prime}}\right. \\
-& \left.+\left(\frac{\mathrm{I}}{\mathrm{X}_d^{\prime}}-\frac{\mathrm{I}}{\mathrm{X}_d}\right) e^{-t / \mathrm{T}_d^{\prime}}+\frac{\mathrm{I}}{\mathrm{X}_d}\right] \sin \left(\omega t+\alpha-\frac{\pi}{2}\right)
-\end{aligned}$"
-
-# ╔═╡ 7a339d70-1e27-4e4e-b602-00a68c307c66
-iac(t, xd, xd1, xd2, Eg, Td2, Td1, α) = √2 * Eg * ((1.0/xd2 - 1.0/xd1) * exp(-t / Td2) + (1.0/xd1 - 1.0/xd) * exp(-t / Td1) + 1/xd) * sin(2π * t + α - π/2.0)
-
-# ╔═╡ 86216ea1-7f38-4244-a2cc-4ca1dae9f413
-iac.(t)
-
-# ╔═╡ 92983777-4c8e-4c05-a38a-6e8376253490
-Plots.plot(t, iac.(t), lw=2.0, gridalpha=0.7)
-
-# ╔═╡ e9022f26-a3dd-405d-abbb-49830b4a1581
+# ╔═╡ 4f4ab72c-96c8-4c18-bad9-7d903cd2030e
 begin
-	Plots.plot(t, iac.(t) + idc.(t), lw=2.0, gridalpha=0.7)
-	Plots.plot!(t, iac.(t), lw=2.0, gridalpha=0.7)
-	Plots.plot!(t, idc.(t), lw=2.0, gridalpha=0.7)
+	plot(t, v(t), lw=2.0, gridalpha=0.8)
+	plot!(t, ir(t), lw=2.0)
 end
 
-# ╔═╡ 30f924c2-7af6-4ed0-b34d-214663c7c66b
-IacRMS(t, xd, xd1, xd2, Eg, Td2, Td1,) = Eg * ((1.0/xd2 - 1.0/xd1) * exp(-t / Td2) + (1.0/xd1 - 1.0/xd) * exp(-t / Td1) + 1/xd)
+# ╔═╡ f8a8fb90-d12d-49f1-90bb-c7c9c28c9451
+pr(t) = v(t) .* ir(t) # potência instantânea no elemento resistivo
 
-# ╔═╡ cf6a9dcf-7e2e-45e3-b71b-bdaf4a4c68e5
+# ╔═╡ 0af66a93-740f-4124-87e4-27b8f947bd32
+areaplot(t, pr(t), fillalpha=0.5, lw=2.0, gridalpha=0.8)
+
+# ╔═╡ 08a60a34-bc00-4a60-bf46-2ee309917a5d
+mean(pr(t)) # valor médio calculado
+
+# ╔═╡ ce5191dd-c66e-4e27-8fb4-672489e8a1e1
+R * Ir^2 # valor médio teórico
+
+# ╔═╡ 42ff974a-0a82-4ce6-993e-7d3df308b1e0
 md"""
-$i_{\mathrm{dcmax}}(t)=\frac{\sqrt{2} \mathrm{E}_g}{\mathrm{X}_d^{\prime \prime}} e^{-t / \mathrm{T}_A}=\sqrt{2} \mathrm{I}^{\prime \prime} e^{-t / \mathrm{T}_A}$
+## Carga Indutiva
 """
 
-# ╔═╡ 937d9121-da23-4c39-994b-30de184a9c24
-idcmax(t, Eg, xd2, Ta) = √2 * Eg / xd2 * exp(-t/Ta)
+# ╔═╡ 88be7614-75bf-4258-a0c2-37a10e319035
+L = 10e-3
 
-# ╔═╡ a6e89bba-a932-4ebd-93ec-aff34851d84c
-md"""
-Equação da corrente de curto-circuito eficaz nos terminais de uma máquina síncrona sem carga, para a condição máxima componente CC:
-"""
+# ╔═╡ c5c21166-c2a0-4a6f-95f4-f5a96615f6fe
+Xl = w * L
 
-# ╔═╡ fe6f6ce4-d1fe-4460-a74e-ed10b26e3599
-md"""
-$\mathrm{I}_{\mathrm{rms}}(t)=\sqrt{\mathrm{I}_{\mathrm{ac}}(t)^2+i_{\mathrm{dc}}(t)^2}$
+# ╔═╡ 89f2d7e6-14c2-4987-8534-2eaa026d3881
+Il = V / Xl
 
-with maximum dc offset:
+# ╔═╡ 5bd660cd-2fdd-4cbd-ba1f-bb8535d900f0
+il(t) = √2 * Il * cos.(w * t .- π/2)
 
-$I_{\text{rms}}(t) = \sqrt{ I_{a c}(t)^2 + \left[\sqrt{2} I^{\prime\prime} e^{-t T_A} \right]^2 }$
-"""
-
-# ╔═╡ 1b840e51-60e0-475d-a5c9-e5e9cb1cd25f
-md"""
-## Example 7.2: Three-phase short-circuit currents, unloaded synchronous generator
-
-A 500-MVA, 20-kV, 60-Hz synchronous generator with:
-
-Reactances: Xd'=0.15, Xd''=0.24, and Xd=1.1 per unit 
-
-Time constants Td''=0.035, Td'=2.0, $T_A$=0.20s 
-
-Is connected to a circuit breaker.
-
-The generator is operating at 5% above rated voltage and at no-load when a bolted three-phase short circuit occurs on the load side of the breaker.
-
-> The breaker interrupts the fault **three cycles after fault inception**. 
-
-!!! tip "Determine"
-	
-	- (a) the subtransient fault current in per-unit and kA rms;
-	- (b) maximum dc offset as a function of time; and
-	- (c) rms asymmetrical fault current, which the breaker interrupts, assuming maximum dc offset.
-"""
-
-# ╔═╡ 9a8ff6e9-be56-4e73-9a91-1df7750c49b7
-md"""
-### Resolução do item 7.2.a
-"""
-
-# ╔═╡ dcdbd33d-f63c-41a5-90fb-b41cc444e197
-md"""
-A tensão de base do sistema é dada por:
-"""
-
-# ╔═╡ cc270593-dbee-497e-b7c3-cf2d1bfc76d7
-Vbase = 20e3
-
-# ╔═╡ 7c0a1241-2ebc-4a57-beb0-14751f35a317
-Xd2 = 0.15
-
-# ╔═╡ 56b0823e-6f37-4eed-b6f5-75c80c005045
-Xd1 = 0.24
-
-# ╔═╡ 3b79644d-67c4-4442-b3d6-302eba750e53
-Xd = 1.1
-
-# ╔═╡ a7f7bc47-2423-4c62-a1fd-decf0345e84a
-md"""
-Como a tensão está elevada em 5% em relação à tensão nominal, em pu teremos:
-"""
-
-# ╔═╡ 14546874-250a-454e-9b6d-be5e497463dd
-Eg = 1.05
-
-# ╔═╡ f6492009-7d2c-4996-8874-7ff408e3c6db
-I2pu = Eg / Xd2
-
-# ╔═╡ eb8f5e3d-14de-4097-9206-b143f8700396
-md"""
-A potência de base nominal e portanto de base do gerador é:
-"""
-
-# ╔═╡ 4fd8a2af-da94-4aca-b271-f94c947eb700
-Sbase = 500e6
-
-# ╔═╡ 924d5b06-aa75-4191-98ab-75a41f920df9
-Ibase = Sbase / (√3 * Vbase)
-
-# ╔═╡ 1c047e47-2595-40b0-8f65-b037ba762125
-md"""
-A corrente de curto-circuito subtransiente rms é dada por:
-
-$I^{''} = I_{pu} \times I_{base}$
-"""
-
-# ╔═╡ 1509ce31-4431-48c2-8e0c-210e9ce6477e
-I2 = I2pu * Ibase
-
-# ╔═╡ a930a50f-dac6-44d3-857d-105ddc9fb63a
-md"""
-### Resolução do item 7.2.b
-"""
-
-# ╔═╡ aea2aa5e-617a-4e1b-9f1c-0a3bd92ce340
-md"""
-### Resolução do item 7.2.c
-"""
-
-# ╔═╡ 2d1ec80a-96e4-40b1-8e9d-3896c35f4c99
-t_=0.0:0.01:10.0
-
-# ╔═╡ 90b1c66d-a742-4c50-97ad-4f143c23e566
-Td2 = 0.035
-
-# ╔═╡ 910abc34-f74b-4650-8a66-da4a8f7c0c1b
-Td1 = 2.0
-
-# ╔═╡ 955e7758-4eb6-4333-ac33-a82c25e5604a
-Ta = 0.2
-
-# ╔═╡ 0faf3f6f-bdea-4db4-b80d-d42b6c4127d5
+# ╔═╡ 284a301b-5e51-4bfa-a9b6-9a5e130cab94
 begin
-	t_dc = 0.0:0.01:2.0
-	Plots.plot(t_dc, idcmax.(t_dc, Eg, Xd2, Ta), lw=2.0, gridalpha=0.8)
+	plot(t, v(t), lw=2.0, gridalpha=0.8)
+	plot!(t, il(t), lw=2.0)
 end
 
-# ╔═╡ 2490edc6-6bfe-46ea-bec9-b65e19525b31
-Plots.plot(t_, iac.(t_, Xd, Xd1, Xd2, Eg, Td2, Td1, α), lw=2.0, gridalpha=0.7)
+# ╔═╡ b42afec6-b1fd-42a4-8d95-49ef2a91a409
+pl(t) = v(t) .* il(t) # potência instantânea no elemento indutivo
 
-# ╔═╡ 7082fa22-42dd-46d5-a1e9-22e3df929351
-t_int = 1.0 / 60.0 * 3.0
+# ╔═╡ 4cd5b9e4-c28a-41a1-8393-6d8f90eb0eec
+areaplot(t, pl(t), fillalpha=0.5, lw=2.0, gridalpha=0.8)
 
-# ╔═╡ d4776e5b-3084-42ce-81eb-d3feab49e6ea
-Iac_int_pu = IacRMS(t_int, Xd, Xd1, Xd2, Eg, Td2, Td1) # em pu
-
-# ╔═╡ f2227335-3315-42d2-8fdc-4e31b58b0787
-Iac_int_Amp = Iac_int_pu * Ibase
-
-# ╔═╡ 3ea7a052-8228-41f4-9eb6-20ddaea9e5b8
-Idc_int_pu = idcmax(t_int, Eg, Xd2, Ta) #em pu
-
-# ╔═╡ a7f0fe74-654e-4521-a7bb-305607dfa4e0
-Idc_int_Amp = Idc_int_pu * Ibase
-
-# ╔═╡ 58996aee-7397-4b3b-b629-5ea0fb887d1d
-Irms = √(Iac_int_Amp^2 + Idc_int_Amp^2)
-
-# ╔═╡ d72c55e4-26c7-4754-8a23-f8d2594e8883
+# ╔═╡ 2ba242ec-f155-40f9-b8af-1687708b8dfb
 md"""
-## Example 7.3: Three-phase short-circuit currents, power system
+## Carga Capacitiva
 """
 
-# ╔═╡ dd91fe06-ae71-4dda-ac90-68e6da916adc
+# ╔═╡ ecd24176-a552-4c1f-9a13-676c3360798c
+C = 1e-3
+
+# ╔═╡ 0fab825d-b269-4211-816d-d9d07b730dd8
+Xc = 1.0 / (w * C)
+
+# ╔═╡ 5c422f76-e760-4254-b05b-d4bf281e3c8c
+Ic = V / Xc
+
+# ╔═╡ 1809bc49-4f1f-4403-b5ac-9444fe0688ca
+ic(t) = √2 * Ic * cos.(w * t .+ π/2)
+
+# ╔═╡ 70aa06d3-cc84-4639-bee8-24ce0bc5eadc
+begin
+	plot(t, v(t), lw=2.0, gridalpha=0.8)
+	plot!(t, ic(t), lw=2.0)
+end
+
+# ╔═╡ 6734a2d5-11e6-4346-a60f-13f6ad6c8549
+pc(t) = v(t) .* ic(t) # potência instantânea no elemento capacitivo
+
+# ╔═╡ 88aec874-4d2f-4bd2-a213-338b8681c2d1
+areaplot(t, pc(t), fillalpha=0.5, lw=2.0, gridalpha=0.8)
+
+# ╔═╡ a988446a-7bfb-4bdf-ada3-783b5fc43573
 md"""
-The synchronous generator in Figure below is operating at rated MVA, 0.95 p.f.
-lagging and at 5% above rated voltage when a bolted three-phase short circuit
-occurs at bus 1.
-
-Calculate the per-unit values of:
-
-!!! tip "Determine"
-	- (a) subtransient fault current;
-	- (b) subtransient generator and motor currents neglecting prefault current; and
-	- (c) subtransient generator and motor currents including prefault current.
+## Carga Genérica
 """
 
-# ╔═╡ d15e0f7e-d190-4f4a-b8bf-f838ab7db740
-md"""
-![Power Network show in figure 7.3](https://drive.google.com/thumbnail?id=1kiC4kmdq21tQ2YdG3cIG-HDRIVH6nvHP&sz=w1000)
-"""
+# ╔═╡ 37732b20-7e29-4c37-84e2-0c15b0c5360f
+Ig = 50.0
 
-# ╔═╡ ce9ae9e3-5f94-4710-bfc5-1356e747c9bc
-md"""
-### Resolução do item 7.3.a
-"""
+# ╔═╡ 861b27c0-9111-438c-9719-dcf31e566e4e
+@bind β Slider(0.0:0.01:π/2.0)
 
-# ╔═╡ 49e6f398-b433-4df7-8e53-c8f345c8f828
-md"""
-Considerando uma potência de base de 100MA, a impedância de base na zona da linha de transmissão será:
-"""
+# ╔═╡ 03b9b036-9909-4952-95c3-e1ba28f4dd91
+β
 
-# ╔═╡ ef536ea1-2ff8-4cd0-a121-3801dc436419
-Zbase = 138.0^2 / 100
+# ╔═╡ 7fc359e9-ac6a-4e2b-9cea-89686b576214
+ig(t) = Ig * cos.(w * t .+ β)
 
-# ╔═╡ 78d7154c-bc98-424c-b853-defe1503cd5c
-Xline = 20.0 / Zbase # em pu
+# ╔═╡ c3aa28fd-2f37-4b6e-a950-30c86d1bad54
+pg(t) = v(t) .* ig(t)
 
-# ╔═╡ c5e95b51-de7a-4b00-9b5e-86a8c8e07207
-md"""
-A impedância de Thevennin vista do ponto onde a falta ocorreu será:
-"""
+# ╔═╡ 9f5a34a4-fd27-4244-9816-2f4c7034fe33
+begin
+	areaplot(t, pg(t), fillalpha=0.5, lw=2.0, ylims=(-5e3,7.5e3), gridalpha=0.8)
+end
 
-# ╔═╡ 06cc00b3-be85-4a55-a5f4-c571ffa04da6
-Zth = 1im * 0.15 * 0.505/(0.15 + 0.505)
+# ╔═╡ 188530a5-748c-476b-8630-c25d03e736a1
+begin
+	plot(t, v(t), lw=2.0, gridalpha=0.8)
+	plot!(t, ig(t), lw=2.0)
+end
 
-# ╔═╡ 900eef46-3747-4209-8329-5a8ee685136a
-Vf = 1.05
+# ╔═╡ 4dc70f4d-b597-4ddb-8f86-f8f977d158c6
 
-# ╔═╡ 5bd77edb-a4b1-4cd9-8f8d-f2068d0056fd
-If_ = Vf / Zth
-
-# ╔═╡ 7bdca241-3b54-4cab-84a8-6ffa9d3217d8
-md"""
-### Resolução do item 7.3.b
-"""
-
-# ╔═╡ 6596f050-2a22-452c-b3f8-a3cb883de192
-md"""
-Para determinar as contribuições de corrente do gerador  e do motor é necessário utilizar a técnica de resolução de circuitos de **divisor de circuitos**:
-"""
-
-# ╔═╡ ae25af59-1bb0-4c53-8db4-acb23a709ce6
-If_gen_pu = 0.505/(0.505 + 0.15) * If_ # contribuição de corrente de falta pelo gerador
-
-# ╔═╡ fec4096b-0e34-42ee-950a-f9ae684ae4c5
-If_mot_pu = 0.15/(0.505 + 0.15) * If_ # contribuição de corrente de falta pelo motor
-
-# ╔═╡ 05547c8a-7c85-42e0-b782-408ac7e00114
-
-
-# ╔═╡ 8967429e-1381-4743-b11d-7ce7d1e5013d
-md"""
-Conciderando agora as correntes de carga do  sistema, no insrtante da falta, tem-se:
-"""
-
-# ╔═╡ c0e07b00-cb62-44f2-b001-1e90d32ce982
-md"""
-### Resolução do item 7.3.c
-"""
-
-# ╔═╡ 3aa0f754-a0af-44db-8e24-eecaa0d35c97
-md"""
-Para esse caso é necessário calcular a corrente de carga do sistema, entregue pelo gerador ao motor.
-"""
-
-# ╔═╡ 35fece5f-2f34-40af-859e-da9dfa5c3464
-md"""
-Corrente de base do gerador
-"""
-
-# ╔═╡ 101bb29b-554f-49f2-a095-a4d0ef307a3e
-Ibase_gen = 100.0e6 / (√3 * 13.8e3)
-
-# ╔═╡ b446892b-fdb1-4528-88d4-0eba1db1976b
-md"""
-Corrente de carga no sistema:
-"""
-
-# ╔═╡ 2be2589d-79c6-4f47-8677-6b07ecea0a74
-Iload = 100.0e6 / (√3 * 1.05 * 13.8e3)
-
-# ╔═╡ fcc5b7a7-1fbc-4633-8666-93b1cb925799
-# angulo da corrente
--rad2deg(acos(0.95))
-
-# ╔═╡ b81c2f8a-e515-4828-b631-0037ed94d8d6
-# Em pu
-Iload_pu = Iload / Ibase_gen * cis(-acos(0.95))
-
-# ╔═╡ 473c08e8-f0cf-4f5b-9320-1e56e3c52a0b
-md"""
-Contribuição de corrente de falta do gerador:
-"""
-
-# ╔═╡ b2da4515-c749-4159-bc09-e2b9ca5051db
-If_gen_pu_2 = If_gen_pu + Iload_pu
-
-# ╔═╡ 92814871-fcd4-49c9-8f7d-5cc6266e98d9
-abs(If_gen_pu_2)
-
-# ╔═╡ 17ec6584-3b9d-447f-bd4b-ddc4bd961e78
-md"""
-Contribuição de corrente de falta do motor 
-"""
-
-# ╔═╡ 592d7781-26a8-4088-a880-e92518b5f157
-If_mot_pu_2 = If_mot_pu - Iload_pu
-
-# ╔═╡ bfbd68c3-a242-4a7c-9e6c-2b11a4f28a4b
-abs(If_mot_pu_2)
-
-# ╔═╡ 2a1b291c-2dc4-40e9-9670-ffa584c60394
-md"""
-## Example 7.4: Using Zbus to compute three-phase short-circuit currents in a power system
-"""
-
-# ╔═╡ 9e13dfee-576e-4ed5-bd32-1926fb36a27d
-md"""
-The faults at bus 1 and 2 in Figure above are of interest. The prefault voltage is
-1.05 per unit, and prefault load current is neglected.
-
-!!! tip "Determine"
-	- (a) The 2 x 2 positive-sequence bus impedance matrix.
-	- (b) For a bolted three-phase short circuit at bus 1, use Zbus to calculate the subtransient fault current and the contribution to the fault current from the transmission line.
-	- (c) Repeat part (b) for a bolted three-phase short circuit at bus 2.
-"""
-
-# ╔═╡ f291620f-63ed-4025-867f-da191440b9db
-md"""
-### Resolução do item 7.3.a
-"""
-
-# ╔═╡ 83d545fd-a812-4e4f-bbb4-8f8c4a419764
-Vf_ = 1.05
-
-# ╔═╡ 22eef67a-202b-4a63-bc73-56cf24611263
-Ybus = [9.9454 -3.2787; -3.2787 8.2787] * -1im
-
-# ╔═╡ caf57502-d1e5-4d50-84ef-6c0041428e3d
-Zbus = inv(Ybus)
-
-# ╔═╡ 131ecc3d-e9c5-44e3-a825-1591ca16b333
-md"""
-### Resolução do item 7.3.b
-"""
-
-# ╔═╡ 2194e947-4388-4858-9549-ca26763ac29d
-md"""
-Para o cálculo da corrente de falta em um barra qualquer n do sistema:
-
-$I_{Fn}^{\prime \prime} = \frac{V_F}{Z_{nn}}$
-"""
-
-# ╔═╡ 69f235e2-bc45-4687-bb73-6cac04fad84c
-md"""
-Corrente de falta subtransiente na barra 1:
-"""
-
-# ╔═╡ 90cd4452-4240-41c9-849b-7a019f69462a
-If1 = Vf_ / Zbus[1, 1]
-
-# ╔═╡ 82a9736c-2544-431e-b590-369ae75201e1
-md"""
-Para o cálculo da tensão em uma barra k qualquer ao longo do sistema:
-
-$E_k = E_k^{(1)} + E_k^{(2)}$
-
-Em que:
-
-$E_k^{(1)} = Z_{kn} (-I_{Fn}^{\prime \prime}) = \frac{-Z_{kn}}{Z_{nn}} V_F$
-
-Negligenciando as correntes de falta:
-
-$E_k^{(2)} = V_F$
-
-A expressão final fica:
-
-$E_k = Z_{kn} (-I_{Fn}^{\prime \prime}) + V_F =  \left( 1 - \frac{Z_{kn}}{Z_{nn}} \right) V_F ~~ \forall k=1, 2, \dots , N$
-
-"""
-
-# ╔═╡ eabfdc1f-cca6-4116-97cd-8e4f2642a53e
-md"""
-Tensões nas barras do sistema no instante no momento da falta:
-"""
-
-# ╔═╡ 8d257bb0-019c-4429-b43e-d154d8ff4a29
-If = [If1; 0.0]
-
-# ╔═╡ 02f51ef7-494e-4d1a-b114-0f14d18fe97b
-Vfs = (Vf_*ones(2, 1) - Zbus * If)
-
-# ╔═╡ 13ee0616-586e-4436-b2e3-262c221e6549
-Zb = (0.1 + 0.105 + 0.1) * 1im
-
-# ╔═╡ b72d0e27-c6af-4a66-8895-d2f6d9f1444f
-I21 = (Vfs[2, 1] - Vfs[1, 1]) / Zb
-
-# ╔═╡ aa2dca1a-ac08-4450-9ec6-68bd5640fe62
-md"""
-### Resolução do item 7.3.c
-"""
-
-# ╔═╡ e077e1a3-dae9-4dfc-9027-3f2d988b717d
-md"""
-Sabendo que 
-
-$V_k = Z_{kn} (-I_{Fn}^{\prime \prime}) + V_F$
-
-De forma geral podemos definir as contribuições para as correntes de falta em toda a rede por:
-
-$I_{i,j} = \frac{V_i - V_j}{Z_b} = - I_{Fn}^{\prime \prime} \left( \frac{Z_{in} - Z_{jn}}{Z_b} \right) = - \frac{V_f}{Z_b} \left( \frac{Z_{in} - Z_{jn}}{Z_{nn}} \right)$
-
-Em que $Z_b$ é a impedância entre as barras i e j.
-"""
-
-# ╔═╡ 099f277e-e428-41cf-af5b-ea010938e0ea
-md"""
-Assim para uma falta simétrica na barra 2:
-"""
-
-# ╔═╡ 2814fff8-e656-4237-9c3c-79ec952ac37f
-If2 = Vf_ / Zbus[2, 2]
-
-# ╔═╡ eb64da7e-93f8-4c1e-833d-5720942867a4
-If2_ = [0.0; If2]
-
-# ╔═╡ a7d3938c-70c2-4f34-8e03-49441f43c35d
-md"""
-Tensões nas barras:
-"""
-
-# ╔═╡ 94c64bde-eda8-4afe-8c1c-762e2a06f9d0
-Vfs2 = (Vf_*ones(2, 1) - Zbus * If2_)
-
-# ╔═╡ c92c7311-cc98-432d-b34a-d0874e4bb5b4
-md"""
-Corrente na linha entre as barras 1 e 2:
-"""
-
-# ╔═╡ 60705442-a5c8-43cc-873b-3a0c8bfc2eb8
-- Vf_ / ((0.1 + 0.105 + 0.1) * 1im) * (Zbus[2, 2] - Zbus[1, 2]) / Zbus[2, 2]
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -568,10 +178,12 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-Plots = "~1.40.5"
-PlutoUI = "~0.7.59"
+Plots = "~1.40.9"
+PlutoUI = "~0.7.61"
+Statistics = "~1.11.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -580,7 +192,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "fb636e041511e946fe7386b567b9c170ef83cc8e"
+project_hash = "def97150bc45ba124837370d373ecf0a163c1694"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1750,129 +1362,48 @@ version = "1.4.1+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═e380e9a2-483a-11ef-1f5e-f99f5fa44310
-# ╠═bde81487-d697-414a-95a7-bb345482eb36
-# ╟─8fd1489d-f07a-4a0a-836d-973246d67120
-# ╟─afaab200-659f-4a79-81a9-13fe162a0083
-# ╟─f7efdf71-c070-4bd2-9db4-edbcd11c3b2e
-# ╟─b25bb256-6ee0-442c-93b5-cad363890c4e
-# ╟─c6dea615-231f-4663-b140-e1112bdfbc8b
-# ╟─e8287e62-a2ec-4601-9822-4ec43948194c
-# ╟─79c048fc-2b89-41eb-9355-cd0ed796a004
-# ╟─3cfe3dd5-b206-4404-8148-13513ecb8760
-# ╠═2ad11673-2a00-4dad-ab55-91b9d193bdf7
-# ╠═bdfdbdd3-cfb9-4190-a565-410d97603a99
-# ╠═8eba05b8-5aac-4d63-8869-c58e17ab69ab
-# ╠═57ce96cf-a051-409a-b899-7a10e70c1b19
-# ╠═45679f09-bf7a-4b32-8d47-bf79a3c41f37
-# ╠═c7e79b2a-ab09-44bf-a31e-b052a8dbeed9
-# ╠═dc827722-d075-4ea2-a729-576c98c48649
-# ╠═10888544-51c7-463c-87b6-0bbde861cda6
-# ╟─87aa731a-35be-4800-a6d0-de7b84625503
-# ╠═2cb7d768-4a1f-42e3-8bde-95a0b61d82da
-# ╠═5928d337-ded3-4490-9edc-61e015d7f9e7
-# ╠═78f2aed3-64ba-42e0-97fb-f9bb53c2b599
-# ╠═86216ea1-7f38-4244-a2cc-4ca1dae9f413
-# ╠═92983777-4c8e-4c05-a38a-6e8376253490
-# ╠═754dcf16-e2fb-447a-a203-708c4e9e5e71
-# ╠═e8adbb2d-ff98-4a1e-a4cb-a305c4ec0f53
-# ╠═053b9c29-a630-4f4b-a8d6-444980049cf6
-# ╠═e9022f26-a3dd-405d-abbb-49830b4a1581
-# ╟─d54fb2ec-15e1-4e50-9172-b6cbbc204be0
-# ╠═27ee4ed2-eda9-42d2-b5b2-05b70019dce1
-# ╠═10c8d80a-5b65-457d-8358-c5e4d1780c4b
-# ╟─aee6f559-9190-42b5-aa0e-abe72afbf440
-# ╟─9b790bb9-bffb-41b1-90e8-c3340f41b656
-# ╠═7a339d70-1e27-4e4e-b602-00a68c307c66
-# ╠═30f924c2-7af6-4ed0-b34d-214663c7c66b
-# ╟─cf6a9dcf-7e2e-45e3-b71b-bdaf4a4c68e5
-# ╠═937d9121-da23-4c39-994b-30de184a9c24
-# ╠═a6e89bba-a932-4ebd-93ec-aff34851d84c
-# ╠═fe6f6ce4-d1fe-4460-a74e-ed10b26e3599
-# ╟─1b840e51-60e0-475d-a5c9-e5e9cb1cd25f
-# ╟─9a8ff6e9-be56-4e73-9a91-1df7750c49b7
-# ╟─dcdbd33d-f63c-41a5-90fb-b41cc444e197
-# ╠═cc270593-dbee-497e-b7c3-cf2d1bfc76d7
-# ╠═7c0a1241-2ebc-4a57-beb0-14751f35a317
-# ╠═56b0823e-6f37-4eed-b6f5-75c80c005045
-# ╠═3b79644d-67c4-4442-b3d6-302eba750e53
-# ╟─a7f7bc47-2423-4c62-a1fd-decf0345e84a
-# ╠═14546874-250a-454e-9b6d-be5e497463dd
-# ╠═f6492009-7d2c-4996-8874-7ff408e3c6db
-# ╟─eb8f5e3d-14de-4097-9206-b143f8700396
-# ╠═4fd8a2af-da94-4aca-b271-f94c947eb700
-# ╠═924d5b06-aa75-4191-98ab-75a41f920df9
-# ╟─1c047e47-2595-40b0-8f65-b037ba762125
-# ╠═1509ce31-4431-48c2-8e0c-210e9ce6477e
-# ╟─a930a50f-dac6-44d3-857d-105ddc9fb63a
-# ╠═0faf3f6f-bdea-4db4-b80d-d42b6c4127d5
-# ╟─aea2aa5e-617a-4e1b-9f1c-0a3bd92ce340
-# ╠═2d1ec80a-96e4-40b1-8e9d-3896c35f4c99
-# ╠═90b1c66d-a742-4c50-97ad-4f143c23e566
-# ╠═910abc34-f74b-4650-8a66-da4a8f7c0c1b
-# ╠═955e7758-4eb6-4333-ac33-a82c25e5604a
-# ╠═2490edc6-6bfe-46ea-bec9-b65e19525b31
-# ╠═7082fa22-42dd-46d5-a1e9-22e3df929351
-# ╠═d4776e5b-3084-42ce-81eb-d3feab49e6ea
-# ╠═f2227335-3315-42d2-8fdc-4e31b58b0787
-# ╠═3ea7a052-8228-41f4-9eb6-20ddaea9e5b8
-# ╠═a7f0fe74-654e-4521-a7bb-305607dfa4e0
-# ╠═58996aee-7397-4b3b-b629-5ea0fb887d1d
-# ╟─d72c55e4-26c7-4754-8a23-f8d2594e8883
-# ╟─dd91fe06-ae71-4dda-ac90-68e6da916adc
-# ╟─d15e0f7e-d190-4f4a-b8bf-f838ab7db740
-# ╟─ce9ae9e3-5f94-4710-bfc5-1356e747c9bc
-# ╟─49e6f398-b433-4df7-8e53-c8f345c8f828
-# ╠═ef536ea1-2ff8-4cd0-a121-3801dc436419
-# ╠═78d7154c-bc98-424c-b853-defe1503cd5c
-# ╟─c5e95b51-de7a-4b00-9b5e-86a8c8e07207
-# ╠═06cc00b3-be85-4a55-a5f4-c571ffa04da6
-# ╠═900eef46-3747-4209-8329-5a8ee685136a
-# ╠═5bd77edb-a4b1-4cd9-8f8d-f2068d0056fd
-# ╟─7bdca241-3b54-4cab-84a8-6ffa9d3217d8
-# ╟─6596f050-2a22-452c-b3f8-a3cb883de192
-# ╠═ae25af59-1bb0-4c53-8db4-acb23a709ce6
-# ╠═fec4096b-0e34-42ee-950a-f9ae684ae4c5
-# ╠═05547c8a-7c85-42e0-b782-408ac7e00114
-# ╟─8967429e-1381-4743-b11d-7ce7d1e5013d
-# ╟─c0e07b00-cb62-44f2-b001-1e90d32ce982
-# ╟─3aa0f754-a0af-44db-8e24-eecaa0d35c97
-# ╟─35fece5f-2f34-40af-859e-da9dfa5c3464
-# ╠═101bb29b-554f-49f2-a095-a4d0ef307a3e
-# ╟─b446892b-fdb1-4528-88d4-0eba1db1976b
-# ╠═2be2589d-79c6-4f47-8677-6b07ecea0a74
-# ╠═fcc5b7a7-1fbc-4633-8666-93b1cb925799
-# ╠═b81c2f8a-e515-4828-b631-0037ed94d8d6
-# ╟─473c08e8-f0cf-4f5b-9320-1e56e3c52a0b
-# ╠═b2da4515-c749-4159-bc09-e2b9ca5051db
-# ╠═92814871-fcd4-49c9-8f7d-5cc6266e98d9
-# ╟─17ec6584-3b9d-447f-bd4b-ddc4bd961e78
-# ╠═592d7781-26a8-4088-a880-e92518b5f157
-# ╠═bfbd68c3-a242-4a7c-9e6c-2b11a4f28a4b
-# ╟─2a1b291c-2dc4-40e9-9670-ffa584c60394
-# ╟─9e13dfee-576e-4ed5-bd32-1926fb36a27d
-# ╟─f291620f-63ed-4025-867f-da191440b9db
-# ╠═83d545fd-a812-4e4f-bbb4-8f8c4a419764
-# ╠═22eef67a-202b-4a63-bc73-56cf24611263
-# ╠═caf57502-d1e5-4d50-84ef-6c0041428e3d
-# ╟─131ecc3d-e9c5-44e3-a825-1591ca16b333
-# ╟─2194e947-4388-4858-9549-ca26763ac29d
-# ╟─69f235e2-bc45-4687-bb73-6cac04fad84c
-# ╠═90cd4452-4240-41c9-849b-7a019f69462a
-# ╟─82a9736c-2544-431e-b590-369ae75201e1
-# ╟─eabfdc1f-cca6-4116-97cd-8e4f2642a53e
-# ╠═8d257bb0-019c-4429-b43e-d154d8ff4a29
-# ╠═02f51ef7-494e-4d1a-b114-0f14d18fe97b
-# ╠═13ee0616-586e-4436-b2e3-262c221e6549
-# ╠═b72d0e27-c6af-4a66-8895-d2f6d9f1444f
-# ╟─aa2dca1a-ac08-4450-9ec6-68bd5640fe62
-# ╟─e077e1a3-dae9-4dfc-9027-3f2d988b717d
-# ╟─099f277e-e428-41cf-af5b-ea010938e0ea
-# ╠═2814fff8-e656-4237-9c3c-79ec952ac37f
-# ╠═eb64da7e-93f8-4c1e-833d-5720942867a4
-# ╟─a7d3938c-70c2-4f34-8e03-49441f43c35d
-# ╠═94c64bde-eda8-4afe-8c1c-762e2a06f9d0
-# ╟─c92c7311-cc98-432d-b34a-d0874e4bb5b4
-# ╠═60705442-a5c8-43cc-873b-3a0c8bfc2eb8
+# ╠═ca0868a6-8fc5-43f9-a16b-2b0617330f5d
+# ╠═a52c3eb1-132d-4977-9def-a0f3b152834f
+# ╠═6c2c3b16-0d98-476f-8ff2-823f8a8f4841
+# ╠═2430af34-3bbe-4a80-bebe-1363843f3063
+# ╠═13dad844-080b-4b4c-82fa-85c98e547501
+# ╠═a126a83b-1047-48c0-9a98-d9efb8e392e4
+# ╠═bfe58c09-4d88-40ab-b952-a2a9308b51ee
+# ╠═cc447562-3008-49d6-b1a8-abadbf13859b
+# ╠═3bfe76b0-7215-44ba-b0b4-46fbf7906a41
+# ╟─3e3af0ef-6d9d-48d5-ac73-9475f9abeb63
+# ╠═11f54bea-ab9b-4a8c-8b9b-2d558863f8fd
+# ╠═89dce491-0281-446a-a2cb-847b63ef7ab4
+# ╠═6f1945f1-8c00-4afc-b99e-111a4088ec46
+# ╠═4f4ab72c-96c8-4c18-bad9-7d903cd2030e
+# ╠═f8a8fb90-d12d-49f1-90bb-c7c9c28c9451
+# ╠═0af66a93-740f-4124-87e4-27b8f947bd32
+# ╠═08a60a34-bc00-4a60-bf46-2ee309917a5d
+# ╠═ce5191dd-c66e-4e27-8fb4-672489e8a1e1
+# ╠═42ff974a-0a82-4ce6-993e-7d3df308b1e0
+# ╠═88be7614-75bf-4258-a0c2-37a10e319035
+# ╠═c5c21166-c2a0-4a6f-95f4-f5a96615f6fe
+# ╠═89f2d7e6-14c2-4987-8534-2eaa026d3881
+# ╠═5bd660cd-2fdd-4cbd-ba1f-bb8535d900f0
+# ╠═284a301b-5e51-4bfa-a9b6-9a5e130cab94
+# ╠═b42afec6-b1fd-42a4-8d95-49ef2a91a409
+# ╠═4cd5b9e4-c28a-41a1-8393-6d8f90eb0eec
+# ╠═2ba242ec-f155-40f9-b8af-1687708b8dfb
+# ╠═ecd24176-a552-4c1f-9a13-676c3360798c
+# ╠═0fab825d-b269-4211-816d-d9d07b730dd8
+# ╠═5c422f76-e760-4254-b05b-d4bf281e3c8c
+# ╠═1809bc49-4f1f-4403-b5ac-9444fe0688ca
+# ╠═70aa06d3-cc84-4639-bee8-24ce0bc5eadc
+# ╠═6734a2d5-11e6-4346-a60f-13f6ad6c8549
+# ╠═88aec874-4d2f-4bd2-a213-338b8681c2d1
+# ╠═a988446a-7bfb-4bdf-ada3-783b5fc43573
+# ╠═37732b20-7e29-4c37-84e2-0c15b0c5360f
+# ╠═03b9b036-9909-4952-95c3-e1ba28f4dd91
+# ╠═7fc359e9-ac6a-4e2b-9cea-89686b576214
+# ╠═c3aa28fd-2f37-4b6e-a950-30c86d1bad54
+# ╠═188530a5-748c-476b-8630-c25d03e736a1
+# ╠═9f5a34a4-fd27-4244-9816-2f4c7034fe33
+# ╠═861b27c0-9111-438c-9719-dcf31e566e4e
+# ╠═4dc70f4d-b597-4ddb-8f86-f8f977d158c6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
